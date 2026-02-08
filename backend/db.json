@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": 1769635550010,
+      "username": "test",
+      "email": "asfasf@saf.com",
+      "password": "$2b$10$1/wQGjkRC8DEBI4p9kfkauyGjlNXJ53eUpy5.osouvBJPiZnd7Ixy",
+      "salt": "$2b$10$1/wQGjkRC8DEBI4p9kfkau"
+    },
+    {
+      "id": 1770327378521,
+      "username": "Test",
+      "email": "asf@as.com",
+      "password": "$2b$10$anMD.4dG2ZKN/CZnwWW0A.GKBnyShRbn739Q/ZjqqXaNDuCmny2o6",
+      "salt": "$2b$10$anMD.4dG2ZKN/CZnwWW0A."
+    }
+  ]
+}
