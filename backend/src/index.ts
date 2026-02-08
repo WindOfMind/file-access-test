@@ -103,8 +103,8 @@ app.post("/login", async (req: Request, res: Response) => {
             { expiresIn: "24h" },
         );
 
+        // TODO: split it into header.payload + signature for better security
         res.cookie("token", token, {
-            httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
             // TODO: move it to config
