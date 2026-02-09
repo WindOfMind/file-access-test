@@ -129,12 +129,25 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 });
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("Hello from the Backend!");
-});
+app.get("/files", authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
 
-app.get("/me", authenticate, (req: AuthRequest, res: Response) => {
-    res.json({ user: req.user });
+        await db.read();
+        const userFiles = db.data.files.filter(
+            (file) => file.userId === req.user!.id,
+        );
+
+        res.status(200).json({
+            files: userFiles,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
 if (process.env.NODE_ENV !== "test") {

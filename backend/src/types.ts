@@ -7,9 +7,20 @@ export interface User {
     salt: string;
 }
 
+// Define the File interface
+export interface File {
+    id: number;
+    name: string;
+    size: number;
+    type: string;
+    uploadedAt: string;
+    userId: number; // owner of the file
+}
+
 // Define the structure of the database
 export interface Data {
     users: User[];
+    files: File[];
 }
 
 export interface AuthPayload {
