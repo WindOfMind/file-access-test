@@ -13,6 +13,7 @@ export interface File {
     name: string;
     size: number;
     type: string;
+    path: string; // file path on disk
     uploadedAt: string;
     userId: number; // owner of the file
 }

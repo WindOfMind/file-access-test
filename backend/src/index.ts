@@ -5,8 +5,12 @@ import { z, ZodError } from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 import { db } from "./db.ts";
-import type { User, AuthRequest } from "./types.ts";
+import type { User, AuthRequest, File } from "./types.ts";
 import { authenticate } from "./middleware/auth.ts";
 
 dotenv.config();
@@ -105,6 +109,7 @@ app.post("/login", async (req: Request, res: Response) => {
 
         // TODO: split it into header.payload + signature for better security
         res.cookie("token", token, {
+            httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
             // TODO: move it to config
@@ -128,6 +133,87 @@ app.post("/login", async (req: Request, res: Response) => {
         }
     }
 });
+
+// Configure multer for file uploads
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, "..", "files");
+
+// Ensure uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(
+            null,
+            file.fieldname +
+                "-" +
+                uniqueSuffix +
+                path.extname(file.originalname),
+        );
+    },
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
+});
+
+// File upload endpoint
+app.post(
+    "/upload",
+    authenticate,
+    upload.single("file"),
+    async (req: AuthRequest, res: Response) => {
+        try {
+            if (!req.user) {
+                res.status(401).json({ error: "Unauthorized" });
+                return;
+            }
+
+            if (!req.file) {
+                res.status(400).json({ error: "No file uploaded" });
+                return;
+            }
+
+            const fileMetadata: File = {
+                id: Date.now(),
+                name: req.file.originalname,
+                size: req.file.size,
+                type: req.file.mimetype,
+                path: req.file.path,
+                uploadedAt: new Date().toISOString(),
+                userId: req.user.id,
+            };
+
+            await db.read();
+            db.data.files.push(fileMetadata);
+            await db.write();
+
+            res.status(201).json({
+                message: "File uploaded successfully",
+                file: {
+                    id: fileMetadata.id,
+                    name: fileMetadata.name,
+                    size: fileMetadata.size,
+                    type: fileMetadata.type,
+                    uploadedAt: fileMetadata.uploadedAt,
+                },
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Internal Server Error" });
+        }
+    },
+);
 
 app.get("/files", authenticate, async (req: AuthRequest, res: Response) => {
     try {
