@@ -13,6 +13,24 @@
       "email": "asf@as.com",
       "password": "$2b$10$anMD.4dG2ZKN/CZnwWW0A.GKBnyShRbn739Q/ZjqqXaNDuCmny2o6",
       "salt": "$2b$10$anMD.4dG2ZKN/CZnwWW0A."
+    },
+    {
+      "id": 1770759050778,
+      "username": "Test",
+      "email": "test@test.com",
+      "password": "$2b$10$1KhSnHQRs6qe8vHKwJeQ3usGDQXpq0nqhXEflafhBQjA0qOaV1IZm",
+      "salt": "$2b$10$1KhSnHQRs6qe8vHKwJeQ3u"
+    }
+  ],
+  "files": [
+    {
+      "id": 1770759900390,
+      "name": "Order.pdf",
+      "size": 369324,
+      "type": "application/pdf",
+      "path": "/Users/daflitonov/Stash/file-access-test/backend/files/file-1770759900387-236388804.pdf",
+      "uploadedAt": "2026-02-10T21:45:00.390Z",
+      "userId": 1770759050778
     }
   ]
 }

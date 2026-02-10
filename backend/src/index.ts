@@ -195,6 +195,9 @@ app.post(
             };
 
             await db.read();
+            if (!db.data.files) {
+                db.data.files = [];
+            }
             db.data.files.push(fileMetadata);
             await db.write();
 
@@ -223,17 +226,26 @@ app.get("/files", authenticate, async (req: AuthRequest, res: Response) => {
         }
 
         await db.read();
-        const userFiles = db.data.files.filter(
+        const userFiles = db.data.files?.filter(
             (file) => file.userId === req.user!.id,
         );
 
         res.status(200).json({
-            files: userFiles,
+            files: userFiles ?? [],
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal Server Error" });
     }
+});
+
+app.post("/logout", (req: Request, res: Response) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+    });
+    res.status(200).json({ message: "Logged out successfully" });
 });
 
 if (process.env.NODE_ENV !== "test") {

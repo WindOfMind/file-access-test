@@ -2,8 +2,6 @@ import type { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import type { AuthRequest, AuthPayload } from "../types.ts";
 
-const JWT_SECRET = process.env.JWT_SECRET || "default_secret_key";
-
 export const authenticate = (
     req: AuthRequest,
     res: Response,
@@ -17,6 +15,7 @@ export const authenticate = (
     }
 
     try {
+        const JWT_SECRET = process.env.JWT_SECRET || "default_secret_key";
         const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
         req.user = decoded;
         next();

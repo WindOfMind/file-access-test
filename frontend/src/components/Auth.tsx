@@ -2,7 +2,17 @@
 
 import { useState } from "react";
 
-export default function Auth() {
+interface User {
+    id: number;
+    username: string;
+    email: string;
+}
+
+export default function Auth({
+    onLoginSuccess,
+}: {
+    onLoginSuccess?: (user: User) => void;
+}) {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
         username: "",
@@ -45,6 +55,8 @@ export default function Auth() {
                 });
                 if (!isLogin) {
                     setIsLogin(true);
+                } else if (onLoginSuccess) {
+                    onLoginSuccess(data.user);
                 }
             } else {
                 setMessage({
